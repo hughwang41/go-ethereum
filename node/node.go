@@ -684,6 +684,18 @@ func (n *Node) WSEndpoint() string {
 	return "ws://" + n.ws.listenAddr() + n.ws.wsConfig.prefix
 }
 
+// WSEndpoint returns the current JSON-RPC over WebSocket endpoint.
+func (n *Node) AuthEndpoint(ws bool) (string, string) {
+	jwtFileName := n.config.JWTSecret
+	if jwtFileName == "" {
+		jwtFileName = n.ResolvePath(datadirJWTKey)
+	}
+	if ws {
+		return "ws://" + n.wsAuth.listenAddr() + n.wsAuth.wsConfig.prefix, jwtFileName
+	}
+	return "http://" + n.httpAuth.listenAddr(), jwtFileName
+}
+
 // EventMux retrieves the event multiplexer used by all the network services in
 // the current protocol stack.
 func (n *Node) EventMux() *event.TypeMux {
